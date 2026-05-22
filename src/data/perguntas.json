@@ -1,0 +1,51 @@
+{
+  "Qual dos benefícios abaixo faz parte do programa de assistência estudantil (PAE)?": [
+    "todas as opções",
+    "auxílio básico",
+    "auxílio infância",
+    "auxílio moradia",
+    "auxílio alimentação"
+  ],
+  "Para ter bons resultados, o(a) estudante da UTFPR geralmente precisa desenvolver autonomia para estudar extraclasse:": [
+    "semanalmente, durante todo o semestre letivo, independente de ter ou não avaliações",
+    "na véspera das avaliações",
+    "no final do ano, antes das avaliações finais",
+    "basta ir às aulas, não é necessário estudo extraclasse",
+    "quando for solicitado pelo professor a estudar"
+  ],
+  "O Núcleo de Acompanhamento Psicopedagógico e de Assistência Estudantil (NUAPE) tem como principal objetivo na universidade:": [
+    "Apoiar a permanência e o sucesso dos estudantes por meio de auxílios financeiros e orientações pedagógicas/psicológicas",
+    "Aplicar advertências para os alunos que tiram notas baixas",
+    "Cuidar exclusivamente da matrícula e da documentação oficial dos cursos",
+    "Organizar eventos esportivos para os estudantes",
+    "Vender livros didáticos e materiais de laboratório com desconto"
+  ],
+  "Durante as oficinas e atendimentos de orientação pedagógica do NUAPE, qual é a principal recomendação dada sobre a organização do tempo na rotina universitária?": [
+    "Criar um cronograma regular, equilibrando as aulas, o estudo extraclasse, o descanso e o lazer",
+    "Estudar apenas nas madrugadas anteriores às provas",
+    "Deixar para revisar a matéria somente quando o professor aplicar uma prova surpresa",
+    "Dedicar 24 horas por dia estritamente aos livros, eliminando qualquer momento de sono ou lazer",
+    "Não planejar nada e decidir o que estudar apenas no caminho para a universidade"
+  ],
+  "Qualquer estudante regularmente matriculado na instituição pode ter acesso aos serviços e atendimentos do NUAPE?": [
+    "Sim, as orientações pedagógicas e acolhimentos são para todos, e os auxílios financeiros são para quem atende aos critérios socioeconômicos dos editais",
+    "Não, o atendimento pedagógico e os auxílios são exclusivos para os alunos que possuem as maiores notas do campus",
+    "Não, apenas alunos do último ano de cada curso podem frequentar o setor",
+    "Sim, mas é necessário pagar uma taxa mensal em dinheiro para ser atendido pela equipe",
+    "Não, o NUAPE atende apenas os professores e servidores da instituição"
+  ],
+  "O que significa NUAPE?": [
+    "Núcleo de Acompanhamento Psicopedagógico e Assistência Estudantil",
+    "Núcleo de Pessoas Especiais",
+    "Núcleo de Inclusão a Pessoas Deficientes;",
+    "Núcleo de Acessibilidade e Suporte a Alunos",
+    "Núcleo de Servidores com Espectro Autista"
+  ],
+  "A UTFPR é uma instituição de ensino…?": [
+    "Pública, federal, gratuita, com 13 campi, sendo que a reitoria da universidade fica em Curitiba",
+    "Pública, federal, gratuita, com um único campus, sendo que a reitoria da universidade fica aqui em Ponta Grossa",
+    "Pública, estadual, gratuita, com 13 campi, sendo que a reitoria da universidade fica em Curitiba",
+    "Privada, com mensalidade, com um único campus, sendo que a reitoria da universidade fica em Ponta Grossa",
+    "Pública, federal, com um único campus, sendo que a reitoria da universidade fica em Curitiba"
+  ]
+}
