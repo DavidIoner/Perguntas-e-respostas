@@ -13,7 +13,7 @@ function PerguntaCard({
     alignItems: "center",
     gap: 24,
 
-    background: "rgba(253, 185, 4)",
+    background: "rgb(253, 185, 4)",
 
     padding: 30,
     borderRadius: 32,
@@ -21,7 +21,7 @@ function PerguntaCard({
     width: "100%",
     boxSizing: "border-box",
 
-    backdropFilter: "blur(6px)",
+    
   }}
 >
   <img
