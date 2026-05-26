@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PerguntaCard from "../components/PerguntaCard";
 import RespostaButton from "../components/RespostaButton";
 
@@ -22,6 +22,9 @@ function TelaJogo({
   conectarUsb,
   desconectarUsb,
   enviarComandoUsb,
+  clearUsbLock,
+  clearSelectionLock,
+  usbLocked,
 }) {
   const [exibirRespostas, setExibirRespostas] = useState(false);
   const [perguntaRespondida, setPerguntaRespondida] = useState(false);
@@ -31,6 +34,9 @@ function TelaJogo({
   const [usbAcusacao, setUsbAcusacao] = useState("");
 
   const timerEndedRef = useRef(false);
+  const earlyHandledRef = useRef(false);
+  const lastUsbActionIdRef = useRef(0);
+  const selectionLockedForThisQuestionRef = useRef(false);
 
   const jogadorButtonStyle = (jogador) => ({
     padding: "15px 30px",
@@ -90,8 +96,42 @@ function TelaJogo({
 
   const botoesEmZero = button1Low && button2Low;
 
+  function selecionarJogador(jogador, mensagem) {
+    if (selectionLockedForThisQuestionRef.current || perguntaRespondida) return false;
+
+    setJogadorSelecionado(jogador);
+    selectionLockedForThisQuestionRef.current = true;
+
+    if (mensagem) {
+      setUsbAcusacao(mensagem);
+    }
+
+    return true;
+  }
+
   useEffect(() => {
     if (!usbAction) return;
+
+    console.log("TelaJogo: usbAction recebido ->", usbAction);
+    console.log("TelaJogo: estado ->", { usbLocked, earlyHandled: earlyHandledRef.current, lastUsbActionId: lastUsbActionIdRef.current, timerEnded: timerEndedRef.current, selectionLockedThisQuestion: selectionLockedForThisQuestionRef.current });
+
+    // Ignore actions that happened before the most recent reset
+    if (usbAction.id && usbAction.id <= lastUsbActionIdRef.current) {
+      console.log("TelaJogo: ignorando usbAction antiga ->", usbAction);
+      return;
+    }
+
+    // Ignore selects if already selected in this question
+    if (usbAction.type === "select" && selectionLockedForThisQuestionRef.current) {
+      console.log("TelaJogo: ignorando select porque já bloqueado nesta pergunta ->", usbAction);
+      return;
+    }
+
+    // Ignore selects if already handled early in this question
+    if (usbAction.type === "select" && earlyHandledRef.current) {
+      console.log("TelaJogo: ignorando select porque early já tratado ->", usbAction);
+      return;
+    }
 
     if (usbAction.type === "early") {
       const offender = usbAction.player;
@@ -100,17 +140,34 @@ function TelaJogo({
       const otherLabel = otherPlayer === "jogador1" ? "1" : "2";
 
       if (exibirRespostas && timerIniciado && !timerEndedRef.current && !perguntaRespondida) {
-        setJogadorSelecionado(otherPlayer);
-        setUsbAcusacao(
+        selecionarJogador(
+          otherPlayer,
           `Jogador ${offenderLabel} pressionou antes do fim do timer. Vez passada para o jogador ${otherLabel}.`
         );
+        earlyHandledRef.current = true;
       }
     }
 
     if (usbAction.type === "select") {
+      // If a select arrives while timer is running, treat as early press
+      if (exibirRespostas && timerIniciado && !timerEndedRef.current && !perguntaRespondida) {
+        const offender = usbAction.player;
+        const otherPlayer = offender === "jogador1" ? "jogador2" : "jogador1";
+        const offenderLabel = offender === "jogador1" ? "1" : "2";
+        const otherLabel = otherPlayer === "jogador1" ? "1" : "2";
+
+        selecionarJogador(
+          otherPlayer,
+          `Jogador ${offenderLabel} pressionou antes do fim do timer. Vez passada para o jogador ${otherLabel}.`
+        );
+        earlyHandledRef.current = true;
+        console.log("TelaJogo: select durante timer tratado como early ->", usbAction);
+        return;
+      }
+
+      // After timer ends, normal select is allowed (but only once, protected by selectionLockedForThisQuestionRef)
       const selectedLabel = usbAction.player === "jogador1" ? "1" : "2";
-      setJogadorSelecionado(usbAction.player);
-      setUsbAcusacao(`Jogador ${selectedLabel} selecionado.`);
+      selecionarJogador(usbAction.player, `Jogador ${selectedLabel} selecionado.`);
     }
   }, [usbAction, exibirRespostas, timerIniciado, perguntaRespondida, setJogadorSelecionado]);
 
@@ -120,11 +177,11 @@ function TelaJogo({
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
       if (e.key === "a" || e.key === "A") {
-        setJogadorSelecionado("jogador1");
+        selecionarJogador("jogador1");
       }
 
       if (e.key === "b" || e.key === "B") {
-        setJogadorSelecionado("jogador2");
+        selecionarJogador("jogador2");
       }
 
       if (e.code === "Space") {
@@ -134,7 +191,7 @@ function TelaJogo({
           return;
         }
 
-        if (perguntaRespondida) {
+        if (perguntaRespondida && botoesEmZero) {
           proximaPergunta();
         }
       }
@@ -157,7 +214,7 @@ function TelaJogo({
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [exibirRespostas, perguntaRespondida, perguntaAtual, proximaPergunta, responder, setJogadorSelecionado]);
+  }, [exibirRespostas, perguntaRespondida, perguntaAtual, proximaPergunta, responder, setJogadorSelecionado, botoesEmZero]);
 
   const timerRestante = Math.max(0, Math.ceil((4000 - timerElapsed) / 1000));
 
@@ -189,6 +246,12 @@ function TelaJogo({
     setUsbAcusacao("");
     setJogadorSelecionado(null);
     setUsbAction?.(null);
+    // prevent replay/late usb actions from affecting the new question
+    lastUsbActionIdRef.current = Date.now();
+    earlyHandledRef.current = false;
+    selectionLockedForThisQuestionRef.current = false;
+    clearUsbLock?.();
+    clearSelectionLock?.();
     timerEndedRef.current = true;
     enviarComandoUsb("LED_OFF");
   }
@@ -271,7 +334,7 @@ function TelaJogo({
     >
       <div style={jogadorPanelStyle}>
         <button
-          onClick={() => setJogadorSelecionado("jogador1")}
+          onClick={() => selecionarJogador("jogador1")}
           style={jogadorButtonStyle("jogador1")}
         >
           Jogador 1
@@ -478,7 +541,7 @@ function TelaJogo({
       <div style={jogadorPanelStyle}>
         <div style={jogadorInfoStyle}>
           <button
-            onClick={() => setJogadorSelecionado("jogador2")}
+            onClick={() => selecionarJogador("jogador2")}
             style={jogadorButtonStyle("jogador2")}
           >
             Jogador 2

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import perguntasJson from "./data/perguntas.json";
 import PergutasScreen from "./screens/perguntasScreen";
@@ -53,6 +53,14 @@ function App() {
   const [usbAction, setUsbAction] = useState(null);
   const [button1Low, setButton1Low] = useState(true);
   const [button2Low, setButton2Low] = useState(true);
+  const [usbLocked, setUsbLocked] = useState(false);
+  const [selectionLocked, setSelectionLocked] = useState(false);
+
+  const button1LowRef = useRef(true);
+  const button2LowRef = useRef(true);
+  const recentSelectRef = useRef({ jogador1: 0, jogador2: 0 });
+  const selectionLockedRef = useRef(false);
+  const usbLockedRef = useRef(false);
 
   const usbPortRef = useRef(null);
   const usbWriterRef = useRef(null);
@@ -69,22 +77,94 @@ function App() {
 
   const processUsbLine = (line) => {
     const command = line.trim().toUpperCase();
+    // Attach a small unique id so identical repeated commands still update state
+    const actionId = Date.now();
+
+    const now = Date.now();
+    const emitSelectIfAllowed = (playerKey, playerLabel) => {
+      // debounce selects to avoid duplicates (800 ms)
+      if (now - recentSelectRef.current[playerKey] < 800) {
+        pushUsbLog(`[DEBOUNCE] ${line} select ${playerLabel}: last=${recentSelectRef.current[playerKey]} now=${now}`);
+        return false;
+      }
+      recentSelectRef.current[playerKey] = now;
+
+      if (!usbLockedRef.current) {
+        setUsbAction({ id: actionId, type: "select", player: playerKey, original: line });
+        // Clear both players' debounce timers to prevent bypass
+        recentSelectRef.current.jogador1 = now;
+        recentSelectRef.current.jogador2 = now;
+        pushUsbLog(`[ACEITO] ${line} select ${playerLabel}`);
+      } else {
+        pushUsbLog(`[BLOQUEADO-EARLY] ${line} select ${playerLabel} por usbLocked`);
+      }
+      return true;
+    };
 
     if (command === "PLAYER1_EARLY") {
-      setUsbAction({ type: "early", player: "jogador1", original: line });
-    } else if (command === "PLAYER2_EARLY") {
-      setUsbAction({ type: "early", player: "jogador2", original: line });
-    } else if (command === "PLAYER1_PRESS" || command === "PLAYER1_PRESSED") {
-      setUsbAction({ type: "select", player: "jogador1", original: line });
       setButton1Low(false);
-    } else if (command === "PLAYER2_PRESS" || command === "PLAYER2_PRESSED") {
-      setUsbAction({ type: "select", player: "jogador2", original: line });
+      button1LowRef.current = false;
+      setUsbAction({ id: actionId, type: "early", player: "jogador1", original: line });
+      setUsbLocked(true);
+      usbLockedRef.current = true;
+      pushUsbLog(`Processado: ${line} -> early jogador1`);
+    } else if (command === "PLAYER2_EARLY") {
       setButton2Low(false);
+      button2LowRef.current = false;
+      setUsbAction({ id: actionId, type: "early", player: "jogador2", original: line });
+      setUsbLocked(true);
+      usbLockedRef.current = true;
+      pushUsbLog(`Processado: ${line} -> early jogador2`);
+    } else if (command === "PLAYER1_PRESS" || command === "PLAYER1_PRESSED") {
+      setButton1Low(false);
+      button1LowRef.current = false;
+      // prefer select on press, but debounce protects duplicates
+      emitSelectIfAllowed("jogador1", "1");
+    } else if (command === "PLAYER2_PRESS" || command === "PLAYER2_PRESSED") {
+      setButton2Low(false);
+      button2LowRef.current = false;
+      emitSelectIfAllowed("jogador2", "2");
     } else if (command === "PLAYER1_RELEASE" || command === "PLAYER1_LOW") {
       setButton1Low(true);
+      button1LowRef.current = true;
+      pushUsbLog(`Processado: ${line} -> release jogador1`);
     } else if (command === "PLAYER2_RELEASE" || command === "PLAYER2_LOW") {
       setButton2Low(true);
+      button2LowRef.current = true;
+      pushUsbLog(`Processado: ${line} -> release jogador2`);
+    } else if (command === "PLAYER1_IGNORED") {
+      setButton1Low(false);
+      button1LowRef.current = false;
+      pushUsbLog(`Processado: ${line} -> pressionamento ignorado jogador1`);
+      emitSelectIfAllowed("jogador1", "1");
+    } else if (command === "PLAYER2_IGNORED") {
+      setButton2Low(false);
+      button2LowRef.current = false;
+      pushUsbLog(`Processado: ${line} -> pressionamento ignorado jogador2`);
+      emitSelectIfAllowed("jogador2", "2");
+    } else if (command === "NEXT_ALLOWED") {
+      setButton1Low(true);
+      setButton2Low(true);
+      button1LowRef.current = true;
+      button2LowRef.current = true;
+      pushUsbLog(`Processado: ${line} -> ambos os botões aliviados`);
     }
+  };
+
+  const clearUsbLock = () => {
+    setUsbLocked(false);
+    usbLockedRef.current = false;
+  };
+  const clearSelectionLock = () => {
+    setSelectionLocked(false);
+    selectionLockedRef.current = false;
+  };
+
+  const resetQuestionLocks = () => {
+    clearUsbLock();
+    clearSelectionLock();
+    setUsbAction(null);
+    recentSelectRef.current = { jogador1: 0, jogador2: 0 };
   };
 
   const readUsbPort = async (port) => {
@@ -110,7 +190,6 @@ function App() {
           lines.forEach((line) => {
             const trimmed = line.trim();
             if (!trimmed) return;
-            pushUsbLog(`Recebido: ${trimmed}`);
             processUsbLine(trimmed);
           });
         }
@@ -258,6 +337,9 @@ function App() {
   }
 
   function proximaPergunta() {
+    resetQuestionLocks();
+    setJogadorSelecionado(null);
+
     if (indice + 1 >= perguntas.length) {
       setFim(true);
       return;
@@ -277,6 +359,7 @@ function App() {
   };
 
   const reiniciarJogo = () => {
+    resetQuestionLocks();
     setPontos({ jogador1: 0, jogador2: 0 });
     setIndice(0);
     setFim(false);
@@ -364,11 +447,16 @@ function App() {
       usbLog={usbLog}
       usbLastCommand={usbLastCommand}
       usbAction={usbAction}
+      setUsbAction={setUsbAction}
       button1Low={button1Low}
       button2Low={button2Low}
       conectarUsb={conectarUsb}
       desconectarUsb={desconectarUsb}
       enviarComandoUsb={enviarComandoUsb}
+      clearUsbLock={clearUsbLock}
+      clearSelectionLock={clearSelectionLock}
+      usbLocked={usbLocked}
+      selectionLocked={selectionLocked}
     />
   );
 }
