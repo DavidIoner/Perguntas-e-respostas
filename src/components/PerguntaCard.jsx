@@ -41,6 +41,7 @@ function PerguntaCard({
         margin: 0,
         fontSize: 24,
         opacity: 0.8,
+        color: "rgb(102, 102, 102)", // cinza claro
       }}
     >
       Pergunta {indice + 1} / {total}
@@ -52,6 +53,7 @@ function PerguntaCard({
         marginTop: 14,
         marginBottom: 0,
         lineHeight: 1.2,
+        color: "rgb(51, 51, 51)",
       }}
     >
       {pergunta}

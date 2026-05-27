@@ -7,6 +7,7 @@ function Placar({ pontos }) {
         marginBottom: 30,
         fontSize: 24,
         fontWeight: "bold",
+        color: "rgb(51, 51, 51)",
       }}
     >
       <div>

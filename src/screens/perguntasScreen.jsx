@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import PerguntaCard from "../components/PerguntaCard";
 import RespostaButton from "../components/RespostaButton";
 
@@ -13,8 +13,6 @@ function TelaJogo({
   proximaPergunta,
   usbConnected,
   usbError,
-  usbLog,
-  usbLastCommand,
   usbAction,
   setUsbAction,
   button1Low,
@@ -57,7 +55,7 @@ function TelaJogo({
     gap: 16,
     padding: 18,
     borderRadius: 28,
-    background: "rgba(255, 236, 176, 0.95)",
+    background: "rgba(228, 179, 18, 0.67)",
     border: "1px solid rgba(255, 236, 176, 0.8)",
     height: "100%",
     flex: "0 0 12%",
@@ -71,6 +69,25 @@ function TelaJogo({
     flexDirection: "column",
     alignItems: "center",
     gap: 12,
+  };
+
+  const jogadorColumnStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignSelf: "stretch",
+    minHeight: "calc(100vh - 40px)",
+    flex: "0 0 12%",
+    maxWidth: "12%",
+    width: "12%",
+    boxSizing: "border-box",
+  };
+
+  const jogadorPanelInternoStyle = {
+    ...jogadorPanelStyle,
+    flex: "0 0 auto",
+    maxWidth: "100%",
+    width: "100%",
+    height: "auto",
   };
 
   const usbButtonContainerStyle = {
@@ -501,61 +518,29 @@ function TelaJogo({
           </div>
         ) : null}
 
-        <div
-          style={{
-            marginTop: 16,
-            padding: 18,
-            borderRadius: 24,
-            background: "rgba(255,255,255,0.18)",
-            color: "#222",
-            width: "100%",
-            maxWidth: 760,
-            boxSizing: "border-box",
-          }}
-        >
-          <div style={{ marginBottom: 12, fontWeight: "700", fontSize: 18 }}>
-            Debug USB Serial
-          </div>
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 12 }}>
-            <div style={{ flex: "1 1 200px" }}>
-              <strong>Status:</strong> {usbConnected ? "Conectado" : "Desconectado"}
-            </div>
-            <div style={{ flex: "1 1 200px" }}>
-              <strong>Último comando:</strong> {usbLastCommand || "Nenhum"}
-            </div>
-          </div>
-          <div style={{ maxHeight: 220, overflowY: "auto", background: "#fff", borderRadius: 16, padding: 12, color: "#222" }}>
-            {usbLog.length === 0 ? (
-              <div style={{ opacity: 0.7 }}>Logs de serial aparecerão aqui.</div>
-            ) : (
-              usbLog.map((item, index) => (
-                <div key={index} style={{ marginBottom: 8, fontSize: 14 }}>
-                  {item}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
       </div>
 
-      <div style={jogadorPanelStyle}>
-        <div style={jogadorInfoStyle}>
-          <button
-            onClick={() => selecionarJogador("jogador2")}
-            style={jogadorButtonStyle("jogador2")}
-          >
-            Jogador 2
-          </button>
-          <div
-            style={{
-              fontSize: 28,
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            {pontos.jogador2}
+      <div style={jogadorColumnStyle}>
+        <div style={jogadorPanelInternoStyle}>
+          <div style={jogadorInfoStyle}>
+            <button
+              onClick={() => selecionarJogador("jogador2")}
+              style={jogadorButtonStyle("jogador2")}
+            >
+              Jogador 2
+            </button>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: "bold",
+                textAlign: "center",
+              }}
+            >
+              {pontos.jogador2}
+            </div>
           </div>
         </div>
+
         <div style={usbButtonContainerStyle}>
           <button
             onClick={usbConnected ? desconectarUsb : conectarUsb}
