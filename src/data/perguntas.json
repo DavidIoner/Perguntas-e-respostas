@@ -47,5 +47,41 @@
     "Pública, estadual, gratuita, com 13 campi, sendo que a reitoria da universidade fica em Curitiba",
     "Privada, com mensalidade, com um único campus, sendo que a reitoria da universidade fica em Ponta Grossa",
     "Pública, federal, com um único campus, sendo que a reitoria da universidade fica em Curitiba"
+  ],
+ "Como o estudante pode entrar em contato com o NUAPE para solicitar apoio pedagógico ou tirar dúvidas gerais?": [
+    "Por meio dos canais oficiais (como e-mail, WhatsApp institucional ou atendimento presencial no campus)",
+    "Apenas enviando uma carta registrada via Correios para a reitoria em Curitiba",
+    "Procurando os professores em sala de aula durante o horário das explicações",
+    "Através de comentários e mensagens diretas nas redes sociais pessoais dos servidores"
+  ],
+  "Quem pode se inscrever para receber os auxílios do Programa de Assistência Estudantil (PAE) da UTFPR?": [
+    "Estudantes regularmente matriculados em cursos técnicos, de graduação ou pós-graduação stricto sensu da instituição",
+    "Apenas estudantes que vieram transferidos de outras universidades públicas",
+    "Somente alunos do primeiro período (calouros) que estudam no turno da noite",
+    "Exclusivamente estudantes que já concluíram o curso e buscam emprego"
+  ],
+  "Se um estudante estiver encontrando muitas dificuldades para organizar o tempo de estudo ou entender as matérias da faculdade, como o NUAPE pode ajudar?": [
+    "Oferecendo atendimento com pedagogos para orientar sobre métodos de estudo, organização de rotina e adaptação à vida universitária",
+    "Contratando um professor particular para dar aulas exclusivas na casa do estudante",
+    "Substituindo as matérias difíceis por outras disciplinas mais fáceis automaticamente",
+    "Abonando todas as faltas do estudante para que ele possa estudar mais tempo em casa"
+  ],
+  "Diante de situações de estresse, ansiedade ou dificuldades emocionais ligadas à rotina acadêmica, qual suporte o estudante encontra no NUAPE?": [
+    "Atendimento e acolhimento com psicólogos para orientação, escuta qualificada e, se necessário, encaminhamento para a rede de saúde externa",
+    "Fornecimento e prescrição direta de medicamentos controlados na própria secretaria do setor",
+    "Emissão de uma dispensa médica permanente que desobriga o aluno de fazer as avaliações do curso",
+    "Sessões obrigatórias de hipnose coletiva antes do início de cada aula prática"
+  ],
+  "Quando um estudante com necessidade específica ingressa na UTFPR, quais tipos de adaptações podem ser realizadas para garantir seus estudos?": [
+    "Adaptação de materiais didáticos (como textos em braille ou ampliados), mediação pedagógica, tempo adicional para provas e acessibilidade arquitetônica",
+    "Diminuição da carga horária do curso pela metade e aprovação automática em matérias de cálculo",
+    "Contratação de um funcionário para fazer as provas e os trabalhos no lugar do estudante",
+    "Isenção total de frequência, permitindo que o aluno nunca precise ir ao campus da universidade"
+  ],
+  "Para os estudantes surdos ou com deficiência auditiva que utilizam a Língua Brasileira de Sinais, como a universidade garante a acessibilidade nas aulas?": [
+    "Disponibilizando Tradutores e Intérpretes de Libras para acompanhar as aulas, eventos acadêmicos e orientações",
+    "Fornecendo fones de ouvido comuns para que eles tentem ouvir melhor o professor",
+    "Solicitando que os próprios colegas de sala de aula façam a tradução voluntária das matérias",
+    "Obrigando o professor a dar a aula inteira por escrito no quadro negro, sem falar nada"
   ]
 }
