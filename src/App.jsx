@@ -22,7 +22,7 @@ function embaralhar(array) {
 }
 
 function App() {
-  const gerarPerguntas = () => {
+  const gerarBancoPerguntas = () => {
     const convertido = Object.entries(perguntasJson).map(
       ([pergunta, respostas]) => ({
         pergunta,
@@ -31,8 +31,18 @@ function App() {
       })
     );
 
-    return embaralhar(convertido).slice(0, 5);
+    return embaralhar(convertido);
   };
+
+  const gerarPerguntaDesempate = (perguntasUsadas) => {
+    const banco = gerarBancoPerguntas();
+    const usadas = new Set(perguntasUsadas.map((p) => p.pergunta));
+    const disponiveis = banco.filter((p) => !usadas.has(p.pergunta));
+
+    return (disponiveis.length > 0 ? disponiveis : banco)[0];
+  };
+
+  const gerarPerguntas = () => gerarBancoPerguntas().slice(0, 5);
 
   const [perguntas, setPerguntas] = useState(gerarPerguntas);
   const [indice, setIndice] = useState(0);
@@ -336,6 +346,15 @@ function App() {
     setJogadorSelecionado(null);
 
     if (indice + 1 >= perguntas.length) {
+      const empatado = pontos.jogador1 === pontos.jogador2;
+
+      if (empatado) {
+        const perguntaDesempate = gerarPerguntaDesempate(perguntas);
+        setPerguntas((anterior) => [...anterior, perguntaDesempate]);
+        setIndice((i) => i + 1);
+        return;
+      }
+
       setFim(true);
       return;
     }
