@@ -1,4 +1,4 @@
-import caramelinho from "../assets/caramelinho_1.png";
+import logo from "../assets/utfpr logo.png";
 
 function PerguntaCard({
   pergunta,
@@ -13,7 +13,7 @@ function PerguntaCard({
     alignItems: "center",
     gap: 24,
 
-    background: "rgb(253, 185, 4)",
+    background: "rgba(238, 185, 39, 0.5)",
 
     padding: 30,
     borderRadius: 32,
@@ -25,7 +25,7 @@ function PerguntaCard({
   }}
 >
   <img
-    src={caramelinho}
+    src={logo}
     alt="Caramelinho"
     style={{
       width: 140,
