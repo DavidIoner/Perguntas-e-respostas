@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import perguntasJson from "./data/perguntas.json";
 import PergutasScreen from "./screens/perguntasScreen";
 import TelaFimJogo from "./screens/fimJogoScreen";
+import TelaDebug from "./screens/debugScreen";
 
 
 function embaralhar(array) {
@@ -63,6 +64,8 @@ function App() {
   const [button2Low, setButton2Low] = useState(true);
   const [usbLocked, setUsbLocked] = useState(false);
   const [selectionLocked, setSelectionLocked] = useState(false);
+  const [debugVisible, setDebugVisible] = useState(false);
+  const [usbLogs, setUsbLogs] = useState([]);
 
   const button1LowRef = useRef(true);
   const button2LowRef = useRef(true);
@@ -78,6 +81,10 @@ function App() {
 
   const pushUsbLog = (message) => {
     console.log(`[USB] ${message}`);
+    setUsbLogs((anterior) => [
+      ...anterior.slice(-99),
+      { hora: new Date().toLocaleTimeString(), mensagem: message },
+    ]);
   };
 
   const processUsbLine = (line) => {
@@ -277,6 +284,10 @@ function App() {
       if (event.key === "End") {
         setFim(true);
       }
+
+      if (event.key === "F2") {
+        setDebugVisible((anterior) => !anterior);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -381,15 +392,11 @@ function App() {
     setPerguntas(gerarPerguntas());
   };
 
-  if (fim) {
-    return <TelaFimJogo pontos={pontos} reiniciarJogo={reiniciarJogo} />;
-  }
-
-  if (!perguntaAtual) {
-    return <h1>Nenhuma pergunta encontrada.</h1>;
-  }
-
-  return (
+  const conteudo = fim ? (
+    <TelaFimJogo pontos={pontos} reiniciarJogo={reiniciarJogo} />
+  ) : !perguntaAtual ? (
+    <h1>Nenhuma pergunta encontrada.</h1>
+  ) : (
     <PergutasScreen
       pontos={pontos}
       jogadorSelecionado={jogadorSelecionado}
@@ -413,6 +420,23 @@ function App() {
       usbLocked={usbLocked}
       selectionLocked={selectionLocked}
     />
+  );
+
+  return (
+    <>
+      {conteudo}
+      <TelaDebug
+        visivel={debugVisible}
+        usbConnected={usbConnected}
+        usbError={usbError}
+        button1Low={button1Low}
+        button2Low={button2Low}
+        usbLocked={usbLocked}
+        selectionLocked={selectionLocked}
+        usbAction={usbAction}
+        logs={usbLogs}
+      />
+    </>
   );
 }
 
